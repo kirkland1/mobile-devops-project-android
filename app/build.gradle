@@ -73,7 +73,7 @@ android {
     buildToolsVersion BUILD_TOOL_VERSION
     compileSdkVersion COMPILE_SDK
 
-    flavorDimensions 'distribution', 'environment'
+    flavorDimensions 'environment'
     useLibrary 'org.apache.http.legacy'
 
     kotlinOptions {
@@ -215,18 +215,18 @@ android {
             matchingFallbacks = ['debug']
             buildConfigField "String", "BUILD_VARIANT_TYPE", "\"Flipper\""
         }
-        release {
-            minifyEnabled true
-            proguardFiles = buildTypes.debug.proguardFiles
-            buildConfigField "String", "BUILD_VARIANT_TYPE", "\"Release\""
-        }
-        perf {
-            initWith debug
-            isDefault false
-            debuggable false
-            matchingFallbacks = ['debug']
-            buildConfigField "String", "BUILD_VARIANT_TYPE", "\"Perf\""
-        }
+//        release {
+//            minifyEnabled true
+//            proguardFiles = buildTypes.debug.proguardFiles
+//            buildConfigField "String", "BUILD_VARIANT_TYPE", "\"Release\""
+//        }
+//        perf {
+//            initWith debug
+//            isDefault false
+//            debuggable false
+//            matchingFallbacks = ['debug']
+//            buildConfigField "String", "BUILD_VARIANT_TYPE", "\"Perf\""
+//        }
         mock {
             initWith debug
             isDefault false
@@ -237,49 +237,49 @@ android {
     }
 
     productFlavors {
-        play {
-            dimension 'distribution'
-            isDefault true
-            ext.websiteUpdateUrl = "null"
-            buildConfigField "boolean", "PLAY_STORE_DISABLED", "false"
-            buildConfigField "String", "NOPLAY_UPDATE_URL", "$ext.websiteUpdateUrl"
-            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"play\""
-        }
+//        play {
+//            dimension 'distribution'
+//            isDefault true
+//            ext.websiteUpdateUrl = "null"
+//            buildConfigField "boolean", "PLAY_STORE_DISABLED", "false"
+//            buildConfigField "String", "NOPLAY_UPDATE_URL", "$ext.websiteUpdateUrl"
+//            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"play\""
+//        }
 
-        website {
-            dimension 'distribution'
-            ext.websiteUpdateUrl = "https://updates.signal.org/android"
-            buildConfigField "boolean", "PLAY_STORE_DISABLED", "true"
-            buildConfigField "String", "NOPLAY_UPDATE_URL", "\"$ext.websiteUpdateUrl\""
-            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"website\""
-        }
+//        website {
+//            dimension 'distribution'
+//            ext.websiteUpdateUrl = "https://updates.signal.org/android"
+//            buildConfigField "boolean", "PLAY_STORE_DISABLED", "true"
+//            buildConfigField "String", "NOPLAY_UPDATE_URL", "\"$ext.websiteUpdateUrl\""
+//            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"website\""
+//        }
 
-        internal {
-            dimension 'distribution'
-            ext.websiteUpdateUrl = "null"
-            buildConfigField "boolean", "PLAY_STORE_DISABLED", "false"
-            buildConfigField "String", "NOPLAY_UPDATE_URL", "$ext.websiteUpdateUrl"
-            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"internal\""
-        }
+//        internal {
+//            dimension 'distribution'
+//            ext.websiteUpdateUrl = "null"
+//            buildConfigField "boolean", "PLAY_STORE_DISABLED", "false"
+//            buildConfigField "String", "NOPLAY_UPDATE_URL", "$ext.websiteUpdateUrl"
+//            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"internal\""
+//        }
 
-        study {
-            dimension 'distribution'
+//        study {
+//            dimension 'distribution'
+//
+//            applicationIdSuffix ".study"
+//            ext.websiteUpdateUrl = "null"
+//            buildConfigField "boolean", "PLAY_STORE_DISABLED", "false"
+//            buildConfigField "String", "NOPLAY_UPDATE_URL", "$ext.websiteUpdateUrl"
+//            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"study\""
+//        }
 
-            applicationIdSuffix ".study"
-            ext.websiteUpdateUrl = "null"
-            buildConfigField "boolean", "PLAY_STORE_DISABLED", "false"
-            buildConfigField "String", "NOPLAY_UPDATE_URL", "$ext.websiteUpdateUrl"
-            buildConfigField "String", "BUILD_DISTRIBUTION_TYPE", "\"study\""
-        }
-
-        prod {
-            dimension 'environment'
-
-            isDefault true
-
-            buildConfigField "String", "MOBILE_COIN_ENVIRONMENT", "\"mainnet\""
-            buildConfigField "String", "BUILD_ENVIRONMENT_TYPE", "\"Prod\""
-        }
+//        prod {
+//            dimension 'environment'
+//
+//            isDefault true
+//
+//            buildConfigField "String", "MOBILE_COIN_ENVIRONMENT", "\"mainnet\""
+//            buildConfigField "String", "BUILD_ENVIRONMENT_TYPE", "\"Prod\""
+//        }
 
         staging {
             dimension 'environment'
@@ -319,21 +319,11 @@ android {
     }
 
     android.variantFilter { variant ->
-        def distribution = variant.getFlavors().get(0).name
-        def environment  = variant.getFlavors().get(1).name
-        def buildType    = variant.buildType.name
-
-        if (distribution == 'study' && buildType != 'perf' && buildType != 'mock') {
-            variant.setIgnore(true)
-        } else if (distribution != 'study' && buildType == 'mock') {
-            variant.setIgnore(true)
-        }
+        variant.setIgnore(true)
     }
 
     lintOptions {
-        abortOnError true
-        baseline file("lint-baseline.xml")
-        disable "LintError"
+        abortOnError false
     }
 
     testOptions {
@@ -530,23 +520,15 @@ def signProductionRelease = { variant ->
 }
 
 task signProductionPlayRelease {
-    doLast {
-        signProductionRelease(android.applicationVariants.find { (it.name == 'playProdRelease') })
-    }
+
 }
 
 task signProductionInternalRelease {
-    doLast {
-        signProductionRelease(android.applicationVariants.find { (it.name == 'internalProdRelease') })
-    }
+
 }
 
 task signProductionWebsiteRelease {
-    doLast {
-        def  variant       = android.applicationVariants.find { (it.name == 'websiteProdRelease') }
-        File signedRelease = signProductionRelease(variant).find { it.name.contains('universal') }
-        assembleWebsiteDescriptor(variant, signedRelease)
-    }
+
 }
 
 def getLastCommitTimestamp() {

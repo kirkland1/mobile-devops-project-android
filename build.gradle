@@ -51,30 +51,8 @@ subprojects {
     ext.lib_signal_service_version_number   = "2.15.3"
     ext.lib_signal_service_group_info       = "org.whispersystems"
     ext.lib_signal_client_version           = "0.1.0"
-
-    if (JavaVersion.current().isJava8Compatible()) {
-        allprojects {
-            tasks.withType(Javadoc) {
-                options.addStringOption('Xdoclint:none', '-quiet')
-            }
-        }
-    }
-
-    if (project.name != "Signal-Android" && project.name != "libsignal-service" && project.name != "lintchecks" && !project.name.endsWith("-app")) {
-        task qa {
-            group 'Verification'
-            description 'Quality Assurance. Run before pushing'
-            dependsOn 'testReleaseUnitTest', 'lintRelease'
-        }
-    }
 }
 
 task qa {
-    group 'Verification'
-    description 'Quality Assurance. Run before pushing.'
-    dependsOn ':Signal-Android:testPlayProdReleaseUnitTest',
-            ':Signal-Android:lintPlayProdRelease',
-            'Signal-Android:ktlintCheck',
-            ':libsignal-service:test',
-            ':Signal-Android:assemblePlayProdDebug'
+
 }
